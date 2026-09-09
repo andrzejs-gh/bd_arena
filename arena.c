@@ -4,20 +4,10 @@
 #include <stdint.h>
 #include <string.h>
 
-#define bda_OFFSET  ( (bd_arena)->cursor % _Alignof(type) )
-#define bda_NEW_POS ( (bd_arena)->cursor + _Alignof(type) - bda_OFFSET )
-// #define bda_VALID
-
-#define bd_arena_PUT(bd_arena, type, ptr)   \
-                    (ptr) =  ?            \
-                    (                       \
-                                            \
-                                            \
-                    ) :
-
 typedef struct
 {
-    size_t capacity;
+    size_t block_capacity;
+    size_t total_size;
     unsigned char* cursor;
     unsigned char* addr;
 
@@ -32,8 +22,9 @@ bd_arena bd_arena_init(size_t capacity)
 
     return (bd_arena)
            {
-               .capacity = capacity,
-               .cursor = addr,
+               .block_capacity = capacity,
+               .total_size = capacity,
+               .cursor = addr + sizeof(void*),
                .addr = addr
            };
 }
@@ -47,11 +38,11 @@ static inline void* get_next_position(void* cursor, size_t alignment)
     return cursor + alignment - offset;
 }
 
-void* bd_arena_alloc(bd_arena* arena, void* data, size_t data_size, size_t alignment)
-{
-    unsigned char* ptr = get_next_position(arena->cursor, alignment);
-    memcpy(ptr, data, data_size);
-
-    arena->cursor = ptr;
-    return ptr;
-}
+// void* bd_arena_alloc(bd_arena* arena, void* data, size_t data_size, size_t alignment)
+// {
+//     unsigned char* ptr = get_next_position(arena->cursor, alignment);
+//     memcpy(ptr, data, data_size);
+//
+//     arena->cursor = ptr;
+//     return ptr;
+// }
