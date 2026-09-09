@@ -41,13 +41,17 @@ bd_arena bd_arena_init(size_t capacity)
 static void* get_next_position(bd_arena* arena, size_t size, size_t alignment)
 {
     unsigned char* cursor = arena->cursor;
-
-
     size_t offset = (uintptr_t)cursor % alignment;
-    if ( !offset )
-        return cursor;
+    unsigned char* new_cursor = cursor + alignment - offset;
 
-    return cursor + alignment - offset;
+    if ( new_cursor - arena->current_block_addr + size > arena->block_capacity )
+    {
+        ;
+    }
+
+
+    arena->cursor = new_cursor;
+    return new_cursor;
 }
 
 // void* bd_arena_alloc(bd_arena* arena, void* data, size_t data_size, size_t alignment)
