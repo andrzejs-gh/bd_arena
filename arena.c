@@ -4,14 +4,11 @@
 #include <stdint.h>
 #include <string.h>
 
-// typedef struct bd_arena_block bd_arena_block;
-//
-// typedef struct bd_arena_block
-// {
-//     bd_arena_block* previous_block;
-//     size_t free_space;
-//
-// } bd_arena_block;
+typedef struct
+{
+    unsigned char* prev_block_ptr;
+
+} bd_arena_handle;
 
 typedef struct
 {
@@ -24,31 +21,45 @@ typedef struct
 
 const bd_arena INVALID_ARENA = {0};
 
-bd_arena bd_arena_init(size_t capacity)
+bd_arena bd_arena_init(size_t block_capacity)
 {
-    unsigned char* current_block_addr = malloc(capacity);
-    if ( !current_block_addr ) return INVALID_ARENA;
+    bd_arena_handle* handle = malloc(sizeof *handle + block_capacity);
+    if ( !handle ) return INVALID_ARENA;
+
+    handle->prev_block_ptr = NULL;
 
     return (bd_arena)
            {
-               .block_capacity = capacity,
-               .total_size = capacity,
-               .cursor = current_block_addr + sizeof(void*),
-               .current_block_addr = current_block_addr
+               .block_capacity = block_capacity,
+               .total_size = sizeof *handle + block_capacity,
+               .cursor = (unsigned char*)handle + sizeof *handle,
+               .current_block_addr = (unsigned char*)handle
            };
 }
 
-static void* get_next_position(bd_arena* arena, size_t size, size_t alignment)
+static void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
 {
     unsigned char* cursor = arena->cursor;
     size_t offset = (uintptr_t)cursor % alignment;
     unsigned char* new_cursor = cursor + alignment - offset;
 
-    if ( new_cursor - arena->current_block_addr + size > arena->block_capacity )
-    {
-        ;
-    }
+    if
+    (
+        (new_cursor - arena->current_block_addr) + size >
+        sizeof(bd_arena_handle) + arena->block_capacity
 
+    ) {
+         // if (  )
+
+         bd_arena_handle* handle = malloc(sizeof *handle + arena->block_capacity);
+         if ( !handle ) return NULL;
+
+         arena->total_size += sizeof *handle + arena->block_capacity;
+         handle->prev_block_ptr = arena->current_block_addr;
+
+         new_cursor = (unsigned char*)handle + sizeof *handle;
+
+      }
 
     arena->cursor = new_cursor;
     return new_cursor;
