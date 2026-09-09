@@ -4,9 +4,11 @@
 #include <stdint.h>
 #include <string.h>
 
-typedef struct
+typedef struct bd_arena_handle bd_arena_handle;
+
+typedef struct bd_arena_handle
 {
-    unsigned char* prev_block_ptr;
+    bd_arena_handle* prev_block_handle;
 
 } bd_arena_handle;
 
@@ -26,7 +28,7 @@ bd_arena bd_arena_init(size_t block_capacity)
     bd_arena_handle* handle = malloc(sizeof *handle + block_capacity);
     if ( !handle ) return INVALID_ARENA;
 
-    handle->prev_block_ptr = NULL;
+    handle->prev_block_handle = NULL;
 
     return (bd_arena)
            {
@@ -37,11 +39,12 @@ bd_arena bd_arena_init(size_t block_capacity)
            };
 }
 
-static void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
+void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
 {
-    unsigned char* cursor = arena->cursor;
-    size_t offset = (uintptr_t)cursor % alignment;
-    unsigned char* new_cursor = cursor + alignment - offset;
+    unsigned char* new_cursor = arena->cursor;
+    size_t offset = (uintptr_t)new_cursor % alignment;
+    if ( offset )
+        new_cursor = new_cursor + alignment - offset;
 
     if
     (
@@ -49,27 +52,43 @@ static void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
         sizeof(bd_arena_handle) + arena->block_capacity
 
     ) {
-         // if (  )
+            size_t new_block_size = sizeof(bd_arena_handle) + arena->block_capacity;
 
-         bd_arena_handle* handle = malloc(sizeof *handle + arena->block_capacity);
-         if ( !handle ) return NULL;
+            bd_arena_handle* handle = malloc(new_block_size);
+            if ( !handle ) return NULL;
 
-         arena->total_size += sizeof *handle + arena->block_capacity;
-         handle->prev_block_ptr = arena->current_block_addr;
+            new_cursor = (unsigned char*)handle + sizeof *handle;
+            offset = (uintptr_t)new_cursor % alignment;
+            if ( offset )
+                new_cursor = new_cursor + alignment - offset;
 
-         new_cursor = (unsigned char*)handle + sizeof *handle;
+            if
+            (
+                (new_cursor - (unsigned char*)handle) + size >
+                sizeof *handle + arena->block_capacity
 
+            ) { free(handle); return NULL; }
+
+            arena->total_size += new_block_size;
+            handle->prev_block_handle = (bd_arena_handle*)arena->current_block_addr;
+            arena->current_block_addr = (unsigned char*)handle;
       }
 
     arena->cursor = new_cursor;
     return new_cursor;
 }
 
-// void* bd_arena_alloc(bd_arena* arena, void* data, size_t data_size, size_t alignment)
-// {
-//     unsigned char* ptr = get_next_position(arena->cursor, alignment);
-//     memcpy(ptr, data, data_size);
-//
-//     arena->cursor = ptr;
-//     return ptr;
-// }
+void bd_arena_free(bd_arena* arena)
+{
+    bd_arena_handle* block_handle = (bd_arena_handle*)arena->current_block_addr;
+    bd_arena_handle* prev_block_handle;
+
+    while ( block_handle )
+    {
+        prev_block_handle = block_handle->prev_block_handle;
+        free(block_handle);
+        block_handle = prev_block_handle;
+    }
+
+    *arena = INVALID_ARENA;
+}
