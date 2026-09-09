@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "arena.h"
+#include "bd_arena.h"
 
 const bd_arena INVALID_ARENA = {0};
 
