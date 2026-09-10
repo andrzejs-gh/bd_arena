@@ -1,8 +1,11 @@
+#ifndef BD_ARENA_H
+#define BD_ARENA_H
+
 #include <stddef.h>
 
-#define bd_arena_DEFAULT_GF 1.0
+#define bda_DEFAULT_GF 1.0
 
-#define bd_arena_ALLOC(arena_ptr, type)                             \
+#define bda_ALLOC(arena_ptr, type)                                  \
         bd_arena_alloc( (arena_ptr), sizeof(type), _Alignof(type) )
 
 typedef struct bd_arena_handle bd_arena_handle;
@@ -24,3 +27,5 @@ typedef struct
 } bd_arena;
 
 extern const bd_arena INVALID_ARENA;
+
+#endif

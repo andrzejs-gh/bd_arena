@@ -17,10 +17,34 @@ bd_arena bd_arena_init(size_t block_capacity)
            {
                .current_block_capacity = block_capacity,
                .total_size = sizeof *handle + block_capacity,
-               .growth_factor = bd_arena_DEFAULT_GF,
+               .growth_factor = bda_DEFAULT_GF,
                .cursor = (unsigned char*)handle + sizeof *handle,
                .current_block_addr = (unsigned char*)handle
            };
+}
+
+bd_arena* bd_arena_is_valid(bd_arena* arena)
+{
+    if ( !arena )
+        return NULL;
+    if ( !arena->current_block_capacity )
+        return NULL;
+    if ( arena->total_size < arena->current_block_capacity )
+        return NULL;
+    if ( !arena->growth_factor )
+        return NULL;
+
+    uintptr_t cursor = (uintptr_t)arena->cursor;
+    uintptr_t data_begin = (uintptr_t)arena->current_block_addr +
+                                            sizeof(bd_arena_handle);
+    uintptr_t data_end = data_begin + arena->current_block_capacity;
+
+    if ( cursor < data_begin || cursor > data_end )
+        return NULL;
+    if ( !arena->current_block_addr )
+        return NULL;
+
+    return arena;
 }
 
 void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
