@@ -72,6 +72,28 @@ void allocation_test(void)
     bd_arena_free(&arena_two);
     i = 0;
 
+    bd_arena arena_three = bd_arena_init(2*LIMIT*sizeof(uint64_t));
+
+    BENCH_STORE
+    (
+        0,
+        LIMIT,
+        time,
+
+        uint64_t* p = bda_HALLOC(&arena_three, uint64_t);
+        *p = i++;
+    );
+
+    printf
+    (
+        "bda_HALLOC: t = %.9f" " (arena initialized as %d*%zu B)"
+        "\n",
+     time,
+     2*LIMIT, sizeof(uint64_t)
+    ); printf("arena_three total_size = %zu \n", arena_three.total_size);
+    bd_arena_free(&arena_three);
+    i = 0;
+
     BENCH_STORE
     (
         0,

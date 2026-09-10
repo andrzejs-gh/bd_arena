@@ -46,19 +46,19 @@ bd_arena* bd_arena_is_valid(bd_arena* arena)
 
     return arena;
 }
-#include <stdio.h>
+//#include <stdio.h>
 void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
 {
     if ( !arena ) return NULL;
 
-    unsigned char* new_cursor = arena->cursor;
-    size_t offset = (uintptr_t)new_cursor % alignment;
+    unsigned char* ptr = arena->cursor;
+    size_t offset = (uintptr_t)ptr % alignment;
     if ( offset )
-        new_cursor = new_cursor + alignment - offset;
-    // printf("%zu >= %zu\n", (new_cursor - arena->current_block_addr) + size, sizeof(bd_arena_handle) + arena->current_block_capacity);
+        ptr = ptr + alignment - offset;
+
     if
     (
-        (new_cursor - arena->current_block_addr) + size >=
+        (ptr - arena->current_block_addr) + size >
         sizeof(bd_arena_handle) + arena->current_block_capacity
 
     ) { //puts("wesz");
@@ -70,14 +70,14 @@ void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
             bd_arena_handle* handle = malloc(new_block_size);
             if ( !handle ) return NULL;
 
-            new_cursor = (unsigned char*)handle + sizeof *handle;
-            offset = (uintptr_t)new_cursor % alignment;
+            ptr = (unsigned char*)handle + sizeof *handle;
+            offset = (uintptr_t)ptr % alignment;
             if ( offset )
-                new_cursor = new_cursor + alignment - offset;
+                ptr = ptr + alignment - offset;
 
             if
             (
-                (new_cursor - (unsigned char*)handle) + size >
+                (ptr - (unsigned char*)handle) + size >
                 sizeof *handle + arena->current_block_capacity
 
             ) { free(handle); return NULL; }
@@ -88,19 +88,19 @@ void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
             arena->current_block_addr = (unsigned char*)handle;
       }
 
-    arena->cursor = new_cursor + size;
-    return new_cursor;
+    arena->cursor = ptr + size;
+    return ptr;
 }
 
 void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment)
 {
-    unsigned char* new_cursor = arena->cursor;
-    size_t offset = (uintptr_t)new_cursor % alignment;
+    unsigned char* ptr = arena->cursor;
+    size_t offset = (uintptr_t)ptr % alignment;
     if ( offset )
-        new_cursor = new_cursor + alignment - offset;
+        ptr = ptr + alignment - offset;
 
-    arena->cursor = new_cursor + size;
-    return new_cursor;
+    arena->cursor = ptr + size;
+    return ptr;
 }
 
 void bd_arena_free(bd_arena* arena)
