@@ -1,16 +1,53 @@
 #include "../bd_arena.h"
 #include "../bd_arena.c"
+#include "time_exec.h"
+
+#include <stdint.h>
 
 #define KiB 1024
 #define MiB 1024*KiB
 
-void test(bd_arena* arena)
-{
+#define LIMIT 1000000
 
+void allocation_test(void)
+{
+    double time;
+    uintptr_t i = 0;
+
+    bd_arena bda = bd_arena_init(LIMIT*sizeof(uint64_t));
+
+    BENCH_STORE
+    (
+        0,
+        LIMIT,
+        time,
+
+        uint64_t* p = bda_ALLOC(&bda, uint64_t);
+        *p = i++;
+    );
+
+    printf("bda_ALLOC: t = %.9f", time);
+    i = 0;
+
+    BENCH_STORE
+    (
+        0,
+        LIMIT,
+        time,
+
+        uint64_t* p = malloc(sizeof *p); // this will end up in 8 MB
+        *p = i++;                        // memory leak, but that's ok
+    );                                   // for the test purposes
+
+    printf("malloc: t = %.9f", time);
+
+    bd_arena_free(&bda);
 }
 
 int main(void)
 {
+    allocation_test();
+
     bd_arena test_arena = bd_arena_init(KiB);
     //if test_arena
 
