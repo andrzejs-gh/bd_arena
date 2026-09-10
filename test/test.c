@@ -14,5 +14,7 @@ int main(void)
     bd_arena test_arena = bd_arena_init(KiB);
     //if test_arena
 
+    bd_arena_free(&test_arena);
+
     return 0;
 }

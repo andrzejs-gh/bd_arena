@@ -39,7 +39,7 @@ bd_arena* bd_arena_is_valid(bd_arena* arena)
                                             sizeof(bd_arena_handle);
     uintptr_t data_end = data_begin + arena->current_block_capacity;
 
-    if ( cursor < data_begin || cursor > data_end )
+    if ( cursor < data_begin || cursor >= data_end )
         return NULL;
     if ( !arena->current_block_addr )
         return NULL;
