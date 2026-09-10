@@ -7,6 +7,7 @@
 #define RED(x) "\033[31m" x "\033[0m"
 #define GREEN(x) "\033[32m" x "\033[0m"
 #define YELLOW(x) "\033[33m" x "\033[0m"
+#define BLUE(x) "\033[34m" x "\033[0m"
 #define CYAN(x) "\033[36m" x "\033[0m"
 
 #define OK "[ " GREEN("OK") " ]"
@@ -33,6 +34,8 @@ void allocation_test(void)
 
     printf(YELLOW("Allocating %d uint64_t's: \n"), LIMIT);
 
+    puts(BLUE("* * *"));
+
     BENCH_STORE
     (
         0,
@@ -42,15 +45,18 @@ void allocation_test(void)
         uint64_t* p = bda_ALLOC(&arena_one, uint64_t);
         *p = i++;
     );
+    i = 0;
 
+    printf("bda_ALLOC:  t = %.9f\n", time);
     printf
     (
-        "bda_ALLOC: t = %.9f" " (arena initialized as only 8 B, growth factor = %.2f)"
-        "\n",
-        time,
+        "arena_one total_size = %zu \n"
+        "arena_one init. cap. was only 8, growth_factor = %.2f \n",
+        arena_one.total_size,
         arena_one.growth_factor
-    ); printf("arena_one total_size = %zu \n", arena_one.total_size);
-    i = 0;
+    );
+
+    puts(BLUE("* * *"));
 
     BENCH_STORE
     (
@@ -61,15 +67,18 @@ void allocation_test(void)
         uint64_t* p = bda_ALLOC(&arena_two, uint64_t);
         *p = i++;
     );
+    i = 0;
 
+    printf("bda_ALLOC:  t = %.9f\n", time);
     printf
     (
-        "bda_ALLOC: t = %.9f" " (arena initialized as %d*%zu B)"
-        "\n",
-        time,
-        LIMIT, sizeof(uint64_t)
-    ); printf("arena_two total_size = %zu \n", arena_two.total_size);
-    i = 0;
+        "arena_two total_size = %zu \n"
+        "arena_two init. cap. was %zu \n",
+        arena_two.total_size,
+        LIMIT*sizeof(uint64_t)
+    );
+
+    puts(BLUE("* * *"));
 
     BENCH_STORE
     (
@@ -80,15 +89,18 @@ void allocation_test(void)
         uint64_t* p = bda_HALLOC(&arena_three, uint64_t);
         *p = i++;
     );
+    i = 0;
 
+    printf("bda_HALLOC: t = %.9f\n", time);
     printf
     (
-        "bda_HALLOC: t = %.9f" " (arena initialized as %d*%zu B)"
-        "\n",
-        time,
-        2*LIMIT, sizeof(uint64_t)
-    ); printf("arena_three total_size = %zu \n", arena_three.total_size);
-    i = 0;
+        "arena_three total_size = %zu \n"
+        "arena_three init. cap. was %zu \n",
+        arena_three.total_size,
+        2*LIMIT*sizeof(uint64_t)
+    );
+
+    puts(BLUE("* * *"));
 
     BENCH_STORE
     (
@@ -100,7 +112,9 @@ void allocation_test(void)
         *p = i++;                        // memory leak, but that's ok
     );                                   // for the test purposes
 
-    printf("malloc:    t = %.9f \n", time);
+    printf("malloc:     t = %.9f \n", time);
+
+    puts(BLUE("* * *"));
 
     puts(CYAN("================================"));
 
