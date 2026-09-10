@@ -28,6 +28,7 @@ void allocation_test(void)
     printf(YELLOW("Allocating %d uint64_t's: \n"), LIMIT);
 
     bd_arena arena_one = bd_arena_init(8);
+    arena_one.growth_factor = 1.5;
 
     BENCH_STORE
     (
