@@ -46,7 +46,7 @@ bd_arena* bd_arena_is_valid(bd_arena* arena)
 
     return arena;
 }
-
+//#include <stdio.h>
 void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
 {
     if ( !arena ) return NULL;
@@ -58,10 +58,10 @@ void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
 
     if
     (
-        (new_cursor - arena->current_block_addr) + size >
+        (new_cursor - arena->current_block_addr) + size >=
         sizeof(bd_arena_handle) + arena->current_block_capacity
 
-    ) {
+    ) { //puts("wesz");
             size_t new_block_capacity = arena->current_block_capacity
                                                 *arena->growth_factor;
             //arena->current_block_capacity *= arena->growth_factor;
