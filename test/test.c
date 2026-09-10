@@ -4,6 +4,17 @@
 
 #include <stdint.h>
 
+#define RED(x) "\033[31m" x "\033[0m"
+#define GREEN(x) "\033[32m" x "\033[0m"
+#define YELLOW(x) "\033[33m" x "\033[0m"
+#define CYAN(x) "\033[36m" x "\033[0m"
+
+#define OK "[ " GREEN("OK") " ]"
+#define ERROR "[ " RED("ERROR") " ]"
+
+#define CR "\033[G"
+#define CLEAR_LINE "\033[2K\033[G"
+
 #define KiB 1024
 #define MiB 1024*KiB
 
@@ -14,7 +25,9 @@ void allocation_test(void)
     double time;
     uintptr_t i = 0;
 
-    bd_arena bda = bd_arena_init(LIMIT*sizeof(uint64_t));
+    bd_arena bda = bd_arena_init(8);//LIMIT*sizeof(uint64_t));
+
+    printf(YELLOW("Allocating %d uint64_t's: \n"), LIMIT);
 
     BENCH_STORE
     (
@@ -26,7 +39,7 @@ void allocation_test(void)
         *p = i++;
     );
 
-    printf("bda_ALLOC: t = %.9f", time);
+    printf("bda_ALLOC: t = %.9f \n", time);
     i = 0;
 
     BENCH_STORE
@@ -39,7 +52,9 @@ void allocation_test(void)
         *p = i++;                        // memory leak, but that's ok
     );                                   // for the test purposes
 
-    printf("malloc: t = %.9f", time);
+    printf("malloc:    t = %.9f \n", time);
+
+    puts(CYAN("================================"));
 
     bd_arena_free(&bda);
 }
