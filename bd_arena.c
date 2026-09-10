@@ -105,6 +105,8 @@ void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment)
 
 void bd_arena_free(bd_arena* arena)
 {
+    if ( !arena ) return;
+
     bd_arena_handle* block_handle = (bd_arena_handle*)arena->current_block_addr;
     bd_arena_handle* prev_block_handle;
 

@@ -25,10 +25,13 @@ void allocation_test(void)
     double time;
     uintptr_t i = 0;
 
-    printf(YELLOW("Allocating %d uint64_t's: \n"), LIMIT);
-
     bd_arena arena_one = bd_arena_init(8);
-    arena_one.growth_factor = 1.5;
+    arena_one.growth_factor = 1.00;
+
+    bd_arena arena_two = bd_arena_init(LIMIT*sizeof(uint64_t));
+    bd_arena arena_three = bd_arena_init(2*LIMIT*sizeof(uint64_t));
+
+    printf(YELLOW("Allocating %d uint64_t's: \n"), LIMIT);
 
     BENCH_STORE
     (
@@ -47,10 +50,7 @@ void allocation_test(void)
         time,
         arena_one.growth_factor
     ); printf("arena_one total_size = %zu \n", arena_one.total_size);
-    bd_arena_free(&arena_one);
     i = 0;
-
-    bd_arena arena_two = bd_arena_init(LIMIT*sizeof(uint64_t));
 
     BENCH_STORE
     (
@@ -69,10 +69,7 @@ void allocation_test(void)
         time,
         LIMIT, sizeof(uint64_t)
     ); printf("arena_two total_size = %zu \n", arena_two.total_size);
-    bd_arena_free(&arena_two);
     i = 0;
-
-    bd_arena arena_three = bd_arena_init(2*LIMIT*sizeof(uint64_t));
 
     BENCH_STORE
     (
@@ -88,10 +85,9 @@ void allocation_test(void)
     (
         "bda_HALLOC: t = %.9f" " (arena initialized as %d*%zu B)"
         "\n",
-     time,
-     2*LIMIT, sizeof(uint64_t)
+        time,
+        2*LIMIT, sizeof(uint64_t)
     ); printf("arena_three total_size = %zu \n", arena_three.total_size);
-    bd_arena_free(&arena_three);
     i = 0;
 
     BENCH_STORE
@@ -108,7 +104,9 @@ void allocation_test(void)
 
     puts(CYAN("================================"));
 
+    bd_arena_free(&arena_one);
     bd_arena_free(&arena_two);
+    bd_arena_free(&arena_three);
 }
 
 int main(void)
