@@ -46,7 +46,7 @@ bd_arena* bd_arena_is_valid(bd_arena* arena)
 
     return arena;
 }
-//#include <stdio.h>
+
 void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
 {
     if ( !arena ) return NULL;
@@ -109,7 +109,7 @@ void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
 
         arena->cursor = ptr + size;
         return ptr;
-      }
+    }
 }
 
 void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment)
