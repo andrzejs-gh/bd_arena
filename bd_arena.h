@@ -11,13 +11,14 @@
 #define bda_HALLOC(arena_ptr, type)                                     \
         bd_arena_halloc( (arena_ptr), sizeof(type), _Alignof(type) )
 
-typedef struct bd_arena_handle bd_arena_handle;
+typedef struct bda_block_header bda_block_header;
 
-typedef struct bd_arena_handle
+typedef struct bda_block_header
 {
-    bd_arena_handle* prev_block_handle;
+    size_t free_space;
+    bda_block_header* prev_block_handle;
 
-} bd_arena_handle;
+} bda_block_header;
 
 typedef struct
 {

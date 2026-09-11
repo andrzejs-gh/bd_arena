@@ -8,10 +8,10 @@ const bd_arena INVALID_ARENA = {0};
 
 bd_arena bd_arena_init(size_t block_capacity)
 {
-    bd_arena_handle* handle = malloc(sizeof *handle + block_capacity);
+    bda_block_header* handle = malloc(sizeof *handle + block_capacity);
     if ( !handle ) return INVALID_ARENA;
 
-    handle->prev_block_handle = NULL;
+    *handle = (bda_block_header){block_capacity, NULL};
 
     return (bd_arena)
            {
@@ -36,7 +36,7 @@ bd_arena* bd_arena_is_valid(bd_arena* arena)
 
     uintptr_t cursor = (uintptr_t)arena->cursor;
     uintptr_t data_begin = (uintptr_t)arena->current_block_addr +
-                                            sizeof(bd_arena_handle);
+                                            sizeof(bda_block_header);
     uintptr_t data_end = data_begin + arena->current_block_capacity;
 
     if ( cursor < data_begin || cursor >= data_end )
@@ -59,15 +59,19 @@ void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
     if
     (
         (ptr - arena->current_block_addr) + size >
-        sizeof(bd_arena_handle) + arena->current_block_capacity
+        sizeof(bda_block_header) + arena->current_block_capacity
+        // (uintptr_t)ptr + size >
+        // (uintptr_t)arena->current_block_addr +
+        // sizeof(bda_block_header) +
+        // arena->current_block_capacity
 
     ) { //puts("wesz");
             size_t new_block_capacity = arena->current_block_capacity
                                                 *arena->growth_factor;
             //arena->current_block_capacity *= arena->growth_factor;
-            size_t new_block_size = sizeof(bd_arena_handle) + new_block_capacity;
+            size_t new_block_size = sizeof(bda_block_header) + new_block_capacity;
             //printf("new_block_capacity = %zu \n", new_block_capacity);
-            bd_arena_handle* handle = malloc(new_block_size);
+            bda_block_header* handle = malloc(new_block_size);
             if ( !handle ) return NULL;
 
             ptr = (unsigned char*)handle + sizeof *handle;
@@ -84,7 +88,7 @@ void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
 
             arena->total_size += new_block_size;
             arena->current_block_capacity = new_block_capacity;
-            handle->prev_block_handle = (bd_arena_handle*)arena->current_block_addr;
+            handle->prev_block_handle = (bda_block_header*)arena->current_block_addr;
             arena->current_block_addr = (unsigned char*)handle;
       }
 
@@ -103,12 +107,56 @@ void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment)
     return ptr;
 }
 
+// char* bd_arena_alloc_str(bd_arena* arena, char* str)
+// {
+//     size_t buffer_len = strlen(str) + 1;
+//
+//     if
+//     (
+//         (uintptr_t)arena->cursor + buffer_len >
+//         (uintptr_t)arena->current_block_addr +
+//         sizeof(bda_block_header) +
+//         arena->current_block_capacity
+//
+//     )   {
+//             size_t new_block_capacity = arena->current_block_capacity
+//                                                 *arena->growth_factor;
+//
+//
+//
+//             size_t new_block_size = sizeof(bda_block_header) + new_block_capacity;
+//
+//             bda_block_header* handle = malloc(new_block_size);
+//             if ( !handle ) return NULL;
+//
+//             unsigned char* new_cursor = (unsigned char*)handle + sizeof *handle;
+//
+//             if
+//                 (
+//                     (ptr - (unsigned char*)handle) + size >
+//                     sizeof *handle + arena->current_block_capacity
+//
+//                 ) { free(handle); return NULL; }
+//
+//             arena->total_size += new_block_size;
+//             arena->current_block_capacity = new_block_capacity;
+//             handle->prev_block_handle = (bda_block_header*)arena->current_block_addr;
+//             arena->current_block_addr = (unsigned char*)handle;
+//
+//
+//         }
+//
+//     // memcpy(arena->cursor, str, buffer_len);
+//
+//     return str;
+// }
+
 void bd_arena_free(bd_arena* arena)
 {
     if ( !arena ) return;
 
-    bd_arena_handle* block_handle = (bd_arena_handle*)arena->current_block_addr;
-    bd_arena_handle* prev_block_handle;
+    bda_block_header* block_handle = (bda_block_header*)arena->current_block_addr;
+    bda_block_header* prev_block_handle;
 
     while ( block_handle )
     {

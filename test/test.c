@@ -43,7 +43,7 @@ void allocation_test(void)
         time,
 
         uint64_t* p = bda_ALLOC(&arena_one, uint64_t);
-        *p = i++;
+        //*p = i++;
     );
     i = 0;
 
@@ -65,7 +65,7 @@ void allocation_test(void)
         time,
 
         uint64_t* p = bda_ALLOC(&arena_two, uint64_t);
-        *p = i++;
+        //*p = i++;
     );
     i = 0;
 
@@ -87,7 +87,7 @@ void allocation_test(void)
         time,
 
         uint64_t* p = bda_HALLOC(&arena_three, uint64_t);
-        *p = i++;
+        //*p = i++;
     );
     i = 0;
 
@@ -109,7 +109,7 @@ void allocation_test(void)
         time,
 
         uint64_t* p = malloc(sizeof *p); // this will end up in 8 MB
-        *p = i++;                        // memory leak, but that's ok
+        //*p = i++;                        // memory leak, but that's ok
     );                                   // for the test purposes
 
     printf("malloc:     t = %.9f \n", time);
