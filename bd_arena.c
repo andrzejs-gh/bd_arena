@@ -123,49 +123,12 @@ void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment)
     return ptr;
 }
 
-// char* bd_arena_alloc_str(bd_arena* arena, char* str)
-// {
-//     size_t buffer_len = strlen(str) + 1;
-//
-//     if
-//     (
-//         (uintptr_t)arena->cursor + buffer_len >
-//         (uintptr_t)arena->current_block_addr +
-//         sizeof(bda_block_header) +
-//         arena->current_block_capacity
-//
-//     )   {
-//             size_t new_block_capacity = arena->current_block_capacity
-//                                                 *arena->growth_factor;
-//
-//
-//
-//             size_t new_block_size = sizeof(bda_block_header) + new_block_capacity;
-//
-//             bda_block_header* handle = malloc(new_block_size);
-//             if ( !handle ) return NULL;
-//
-//             unsigned char* new_cursor = (unsigned char*)handle + sizeof *handle;
-//
-//             if
-//                 (
-//                     (ptr - (unsigned char*)handle) + size >
-//                     sizeof *handle + arena->current_block_capacity
-//
-//                 ) { free(handle); return NULL; }
-//
-//             arena->total_size += new_block_size;
-//             arena->current_block_capacity = new_block_capacity;
-//             handle->prev_block_handle = (bda_block_header*)arena->current_block_addr;
-//             arena->current_block_addr = (unsigned char*)handle;
-//
-//
-//         }
-//
-//     // memcpy(arena->cursor, str, buffer_len);
-//
-//     return str;
-// }
+void* bd_arena_alloc_bytes(bd_arena* arena, void* buffer, size_t buffer_len)
+{
+
+
+    return buffer;
+}
 
 void bd_arena_free(bd_arena* arena)
 {
