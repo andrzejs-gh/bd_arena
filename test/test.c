@@ -3,6 +3,8 @@
 #include "time_exec.h"
 
 #include <stdint.h>
+#include <assert.h>
+#include <stdbool.h>
 
 #define RED(x) "\033[31m" x "\033[0m"
 #define GREEN(x) "\033[32m" x "\033[0m"
@@ -123,39 +125,26 @@ void allocation_test(void)
     bd_arena_free(&arena_three);
 }
 
-void buff_alloc(void)
+void put_test(void)
 {
+    char buffer[256];
 
-    const char* t = "Sławuś bławuś elemelek chujek ejwdiewbfkebfewf";
-    const char* tt = "weoiew fiew fiew fuhe wify ewifybef iewyf u ejwdiewbfkebfewf";
+    puts("Insert arbitrary (max 255 bytes) text and press ENTER:");
 
-    bd_arena arena = bd_arena_init(strlen(tt)+1);
-    printf("arena init size = %zu \n", arena.total_size);
+    void* ret = fgets(buffer, sizeof(buffer), stdin);
+    if ( !ret )
+    {
+        puts(ERROR " fgets failure");
+        assert(false);
+    }
 
-    char* p = bda_PUT_STR(&arena, t);
-    puts(p);
-
-    char* pp = bda_PUT_BYTES(&arena, t, strlen(t)+1);
-    puts(pp);
-
-    p = bda_PUT_STR(&arena, tt);
-    puts(p);
-
-    pp = bda_PUT_BYTES(&arena, tt, strlen(tt)+1);
-    puts(pp);
-
-    p = bda_PUT_STR(&arena, "chuje muje dzikie wenżę");
-    puts(p);
-
-    printf("arena total size = %zu \n", arena.total_size);
-
-    bd_arena_free(&arena);
+    puts(buffer);
 }
 
 int main(void)
 {
     allocation_test();
-    buff_alloc();
+    put_test();
 
     bd_arena test_arena = bd_arena_init(KiB);
     //if test_arena
