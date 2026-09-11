@@ -5,28 +5,28 @@
 
 #define bda_DEFAULT_GF 1.0
 
-#define bda_ALLOC(arena_ptr, type)                                      \
+#define bda_ALLOC(arena_ptr, type)                                          \
         bd_arena_alloc( (arena_ptr), sizeof(type), _Alignof(type) )
 
-#define bda_HALLOC(arena_ptr, type)                                     \
+#define bda_HALLOC(arena_ptr, type)                                         \
         bd_arena_halloc( (arena_ptr), sizeof(type), _Alignof(type) )
 
-#define bda_RESERVE(arena_ptr, size)                                    \
+#define bda_RESERVE(arena_ptr, size)                                        \
         bd_arena_alloc( (arena_ptr), size, 1 )
 
-#define bda_HRESERVE(arena_ptr, size)                                   \
+#define bda_HRESERVE(arena_ptr, size)                                       \
         bd_arena_halloc( (arena_ptr), size, 1 )
 
-#define bda_PUT_STR(arena_ptr, str)                                     \
-        bd_arena_put_bytes( (arena_ptr), str, strlen(str) )
+#define bda_PUT_STR(arena_ptr, str)                                         \
+        bd_arena_put_bytes( (arena_ptr), (void*)(str), strlen(str)+1 )
 
-#define bda_HPUT_STR(arena_ptr, str)                                     \
-        bd_arena_hput_bytes( (arena_ptr), str, strlen(str) )
+#define bda_HPUT_STR(arena_ptr, str)                                        \
+        bd_arena_hput_bytes( (arena_ptr), (void*)(str), strlen(str)+1 )
 
-#define bda_PUT_BYTES(arena_ptr, buffer, buffer_len)                    \
+#define bda_PUT_BYTES(arena_ptr, buffer, buffer_len)                        \
         bd_arena_put_bytes( (arena_ptr), buffer, buffer_len )
 
-#define bda_HPUT_BYTES(arena_ptr, buffer, buffer_len)                    \
+#define bda_HPUT_BYTES(arena_ptr, buffer, buffer_len)                       \
         bd_arena_hput_bytes( (arena_ptr), buffer, buffer_len )
 
 typedef struct bda_block_header bda_block_header;

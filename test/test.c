@@ -129,17 +129,23 @@ void buff_alloc(void)
     const char* t = "Sławuś bławuś elemelek chujek ejwdiewbfkebfewf";
     const char* tt = "weoiew fiew fiew fuhe wify ewifybef iewyf u ejwdiewbfkebfewf";
 
-    bd_arena arena = bd_arena_init(strlen(tt));
+    bd_arena arena = bd_arena_init(strlen(tt)+1);
     printf("arena init size = %zu \n", arena.total_size);
 
-    // char* p = bda_BUFFER(&arena, strlen(t));
-    // //(char* ptr = bda_BUFFER(&arena, strlen(t))) ? strcpy(ptr, t) : NULL ;
-    // strcpy(p, t);
-    // puts(p);
-    //
-    // char* pp = bda_BUFFER(&arena, strlen(tt));
-    // strcpy(pp, tt);
-    // puts(pp);
+    char* p = bda_PUT_STR(&arena, t);
+    puts(p);
+
+    char* pp = bda_PUT_BYTES(&arena, t, strlen(t)+1);
+    puts(pp);
+
+    p = bda_PUT_STR(&arena, tt);
+    puts(p);
+
+    pp = bda_PUT_BYTES(&arena, tt, strlen(tt)+1);
+    puts(pp);
+
+    p = bda_PUT_STR(&arena, "chuje muje dzikie wenżę");
+    puts(p);
 
     printf("arena total size = %zu \n", arena.total_size);
 
