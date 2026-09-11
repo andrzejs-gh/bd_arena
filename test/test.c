@@ -123,9 +123,32 @@ void allocation_test(void)
     bd_arena_free(&arena_three);
 }
 
+void buff_alloc(void)
+{
+
+    const char* t = "Sławuś bławuś elemelek chujek ejwdiewbfkebfewf";
+    const char* tt = "weoiew fiew fiew fuhe wify ewifybef iewyf u ejwdiewbfkebfewf";
+
+    bd_arena arena = bd_arena_init(strlen(tt));
+    printf("arena init size = %zu \n", arena.total_size);
+
+    char* p = bda_BUFFER(&arena, strlen(t));
+    strcpy(p, t);
+    puts(p);
+
+    char* pp = bda_BUFFER(&arena, strlen(tt));
+    strcpy(pp, tt);
+    puts(pp);
+
+    printf("arena total size = %zu \n", arena.total_size);
+
+    bd_arena_free(&arena);
+}
+
 int main(void)
 {
     allocation_test();
+    buff_alloc();
 
     bd_arena test_arena = bd_arena_init(KiB);
     //if test_arena

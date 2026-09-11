@@ -11,6 +11,12 @@
 #define bda_HALLOC(arena_ptr, type)                                     \
         bd_arena_halloc( (arena_ptr), sizeof(type), _Alignof(type) )
 
+#define bda_BUFFER(arena_ptr, size)                                     \
+        bda_ALLOC((arena_ptr), char[size])
+
+#define bda_HBUFFER(arena_ptr, size)                                    \
+        bda_HALLOC((arena_ptr), char[size])
+
 typedef struct bda_block_header bda_block_header;
 
 typedef struct bda_block_header

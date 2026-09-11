@@ -123,13 +123,6 @@ void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment)
     return ptr;
 }
 
-void* bd_arena_alloc_bytes(bd_arena* arena, void* buffer, size_t buffer_len)
-{
-
-
-    return buffer;
-}
-
 void bd_arena_free(bd_arena* arena)
 {
     if ( !arena ) return;
