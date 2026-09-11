@@ -54,6 +54,7 @@ bd_arena bd_arena_init(size_t block_capacity);
 bd_arena* bd_arena_is_valid(bd_arena* arena);
 void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment);
 void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment);
+void* bd_arena_put_bytes(bd_arena* arena, const void* buffer, size_t len);
 void bd_arena_free(bd_arena* arena);
 
 #endif
