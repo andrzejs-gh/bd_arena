@@ -132,13 +132,14 @@ void buff_alloc(void)
     bd_arena arena = bd_arena_init(strlen(tt));
     printf("arena init size = %zu \n", arena.total_size);
 
-    char* p = bda_BUFFER(&arena, strlen(t));
-    strcpy(p, t);
-    puts(p);
-
-    char* pp = bda_BUFFER(&arena, strlen(tt));
-    strcpy(pp, tt);
-    puts(pp);
+    // char* p = bda_BUFFER(&arena, strlen(t));
+    // //(char* ptr = bda_BUFFER(&arena, strlen(t))) ? strcpy(ptr, t) : NULL ;
+    // strcpy(p, t);
+    // puts(p);
+    //
+    // char* pp = bda_BUFFER(&arena, strlen(tt));
+    // strcpy(pp, tt);
+    // puts(pp);
 
     printf("arena total size = %zu \n", arena.total_size);
 
