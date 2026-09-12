@@ -133,11 +133,36 @@ void* bd_arena_put_bytes(bd_arena* arena, const void* buffer, size_t len)
     return ptr;
 }
 
-void* bd_arena_hput_bytes(bd_arena* arena, void* buffer, size_t len)
+void* bd_arena_hput_bytes(bd_arena* arena, const void* buffer, size_t len)
 {
     void* ptr = bda_HRESERVE(arena, len);
 
     memcpy(ptr, buffer, len);
+    return ptr;
+}
+
+char* bd_arena_put_str(bd_arena* arena, const char* str)
+{
+    if ( !str )
+        return NULL;
+
+    size_t len = strlen(str) + 1;
+
+    char* ptr = bda_RESERVE(arena, len);
+    if ( !ptr )
+        return NULL;
+
+    memcpy(ptr, str, len);
+    return ptr;
+}
+
+char* bd_arena_hput_str(bd_arena* arena, const char* str)
+{
+    size_t len = strlen(str) + 1;
+
+    char* ptr = bda_HRESERVE(arena, len);
+
+    memcpy(ptr, str, len);
     return ptr;
 }
 
