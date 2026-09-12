@@ -6,7 +6,7 @@
 
 const bd_arena INVALID_ARENA = {0};
 
-bd_arena bd_arena_init(size_t block_capacity)
+bd_arena bda_init(size_t block_capacity)
 {
     bda_block_header* handle = malloc(sizeof *handle + block_capacity);
     if ( !handle ) return INVALID_ARENA;
@@ -23,7 +23,7 @@ bd_arena bd_arena_init(size_t block_capacity)
            };
 }
 
-bd_arena* bd_arena_is_valid(bd_arena* arena)
+bd_arena* bda_is_valid(bd_arena* arena)
 {
     if ( !arena )
         return NULL;
@@ -47,7 +47,7 @@ bd_arena* bd_arena_is_valid(bd_arena* arena)
     return arena;
 }
 
-void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
+void* bda_alloc(bd_arena* arena, size_t size, size_t alignment)
 {
     if ( !arena ) return NULL;
 
@@ -112,7 +112,7 @@ void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment)
     }
 }
 
-void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment)
+void* bda_halloc(bd_arena* arena, size_t size, size_t alignment)
 {
     unsigned char* ptr = arena->cursor;
     size_t offset = (uintptr_t)ptr % alignment;
@@ -123,7 +123,7 @@ void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment)
     return ptr;
 }
 
-void* bd_arena_put_bytes(bd_arena* arena, const void* buffer, size_t len)
+void* bda_put_bytes(bd_arena* arena, const void* buffer, size_t len)
 {
     void* ptr = bda_RESERVE(arena, len);
     if ( !ptr )
@@ -133,7 +133,7 @@ void* bd_arena_put_bytes(bd_arena* arena, const void* buffer, size_t len)
     return ptr;
 }
 
-void* bd_arena_hput_bytes(bd_arena* arena, const void* buffer, size_t len)
+void* bda_hput_bytes(bd_arena* arena, const void* buffer, size_t len)
 {
     void* ptr = bda_HRESERVE(arena, len);
 
@@ -141,7 +141,7 @@ void* bd_arena_hput_bytes(bd_arena* arena, const void* buffer, size_t len)
     return ptr;
 }
 
-char* bd_arena_put_str(bd_arena* arena, const char* str)
+char* bda_put_str(bd_arena* arena, const char* str)
 {
     if ( !str )
         return NULL;
@@ -156,7 +156,7 @@ char* bd_arena_put_str(bd_arena* arena, const char* str)
     return ptr;
 }
 
-char* bd_arena_hput_str(bd_arena* arena, const char* str)
+char* bda_hput_str(bd_arena* arena, const char* str)
 {
     size_t len = strlen(str) + 1;
 
@@ -166,7 +166,7 @@ char* bd_arena_hput_str(bd_arena* arena, const char* str)
     return ptr;
 }
 
-void bd_arena_free(bd_arena* arena)
+void bda_free(bd_arena* arena)
 {
     if ( !arena ) return;
 

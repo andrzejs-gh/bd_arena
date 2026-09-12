@@ -28,11 +28,11 @@ void allocation_test(void)
     double time;
     uintptr_t i = 0;
 
-    bd_arena arena_one = bd_arena_init(8);
+    bd_arena arena_one = bda_init(8);
     arena_one.growth_factor = 1.00;
 
-    bd_arena arena_two = bd_arena_init(LIMIT*sizeof(uint64_t));
-    bd_arena arena_three = bd_arena_init(2*LIMIT*sizeof(uint64_t));
+    bd_arena arena_two = bda_init(LIMIT*sizeof(uint64_t));
+    bd_arena arena_three = bda_init(2*LIMIT*sizeof(uint64_t));
 
     printf(YELLOW("Allocating %d uint64_t's: \n"), LIMIT);
 
@@ -120,16 +120,16 @@ void allocation_test(void)
 
     puts(CYAN("================================"));
 
-    bd_arena_free(&arena_one);
-    bd_arena_free(&arena_two);
-    bd_arena_free(&arena_three);
+    bda_free(&arena_one);
+    bda_free(&arena_two);
+    bda_free(&arena_three);
 }
 
 void put_test(void)
 {
     char buffer[256];
 
-    puts("Insert arbitrary (max 255 bytes) text and press ENTER:");
+    puts("Insert arbitrary (max 255 bytes) text and press ENTER: \n");
 
     void* ret = fgets(buffer, sizeof(buffer), stdin);
     if ( !ret )
@@ -138,7 +138,11 @@ void put_test(void)
         assert(false);
     }
 
-    puts(buffer);
+    bd_arena ar = bda_init(sizeof(buffer));
+    char* p = bda_put_str(&ar, buffer);
+    printf("Inserted text: %s \n", p);
+
+    bda_free(&ar);
 }
 
 int main(void)
@@ -146,10 +150,10 @@ int main(void)
     allocation_test();
     put_test();
 
-    bd_arena test_arena = bd_arena_init(KiB);
+    bd_arena test_arena = bda_init(KiB);
     //if test_arena
 
-    bd_arena_free(&test_arena);
+    bda_free(&test_arena);
 
     return 0;
 }

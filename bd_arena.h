@@ -6,28 +6,16 @@
 #define bda_DEFAULT_GF 1.0
 
 #define bda_ALLOC(arena_ptr, type)                                          \
-        bd_arena_alloc( (arena_ptr), sizeof(type), _Alignof(type) )
+        bda_alloc( (arena_ptr), sizeof(type), _Alignof(type) )
 
 #define bda_HALLOC(arena_ptr, type)                                         \
-        bd_arena_halloc( (arena_ptr), sizeof(type), _Alignof(type) )
+        bda_halloc( (arena_ptr), sizeof(type), _Alignof(type) )
 
 #define bda_RESERVE(arena_ptr, size)                                        \
-        bd_arena_alloc( (arena_ptr), (size), 1 )
+        bda_alloc( (arena_ptr), (size), 1 )
 
 #define bda_HRESERVE(arena_ptr, size)                                       \
-        bd_arena_halloc( (arena_ptr), (size), 1 )
-
-#define bda_PUT_STR(arena_ptr, str)                                         \
-        bd_arena_put_str( (arena_ptr), (str) )
-
-#define bda_HPUT_STR(arena_ptr, str)                                        \
-        bd_arena_hput_str( (arena_ptr), (str) )
-
-#define bda_PUT_BYTES(arena_ptr, buffer, buffer_len)                        \
-        bd_arena_put_bytes( (arena_ptr), (buffer), (buffer_len) )
-
-#define bda_HPUT_BYTES(arena_ptr, buffer, buffer_len)                       \
-        bd_arena_hput_bytes( (arena_ptr), (buffer), (buffer_len) )
+        bda_halloc( (arena_ptr), (size), 1 )
 
 typedef struct bda_block_header bda_block_header;
 
@@ -50,14 +38,14 @@ typedef struct
 
 extern const bd_arena INVALID_ARENA;
 
-bd_arena bd_arena_init(size_t block_capacity);
-bd_arena* bd_arena_is_valid(bd_arena* arena);
-void* bd_arena_alloc(bd_arena* arena, size_t size, size_t alignment);
-void* bd_arena_halloc(bd_arena* arena, size_t size, size_t alignment);
-void* bd_arena_put_bytes(bd_arena* arena, const void* buffer, size_t len);
-void* bd_arena_hput_bytes(bd_arena* arena, const void* buffer, size_t len);
-char* bd_arena_put_str(bd_arena* arena, const char* str);
-char* bd_arena_hput_str(bd_arena* arena, const char* str);
-void bd_arena_free(bd_arena* arena);
+bd_arena bda_init(size_t block_capacity);
+bd_arena* bda_is_valid(bd_arena* arena);
+void* bda_alloc(bd_arena* arena, size_t size, size_t alignment);
+void* bda_halloc(bd_arena* arena, size_t size, size_t alignment);
+void* bda_put_bytes(bd_arena* arena, const void* buffer, size_t len);
+void* bda_hput_bytes(bd_arena* arena, const void* buffer, size_t len);
+char* bda_put_str(bd_arena* arena, const char* str);
+char* bda_hput_str(bd_arena* arena, const char* str);
+void bda_free(bd_arena* arena);
 
 #endif
