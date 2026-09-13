@@ -166,6 +166,13 @@ char* bda_hput_str(bd_arena* arena, const char* str)
     return ptr;
 }
 
+void bda_lock(bd_arena* arena)
+{
+    if ( !arena ) return;
+
+    arena->growth_factor = 0.0;
+}
+
 void bda_free(bd_arena* arena)
 {
     if ( !arena ) return;

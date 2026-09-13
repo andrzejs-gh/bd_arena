@@ -46,6 +46,7 @@ void* bda_put_bytes(bd_arena* arena, const void* buffer, size_t len);
 void* bda_hput_bytes(bd_arena* arena, const void* buffer, size_t len);
 char* bda_put_str(bd_arena* arena, const char* str);
 char* bda_hput_str(bd_arena* arena, const char* str);
+void bda_lock(bd_arena* arena);
 void bda_free(bd_arena* arena);
 
 #endif
