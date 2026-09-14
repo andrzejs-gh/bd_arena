@@ -53,23 +53,14 @@ void* bda_alloc(bd_arena* arena, size_t size, size_t alignment)
 
     if ( *(size_t*)(arena->current_block_addr) >= size )
     {
-        unsigned char* ptr = arena->cursor;
+        uintptr_t old_cursor = (uintptr_t)arena->cursor;
+        uintptr_t pos = (old_cursor + alignment - 1) & ~(alignment - 1);
 
-        size_t offset = (uintptr_t)ptr % alignment;
-        if ( offset )
-        {
-            ptr = ptr + alignment - offset;
-            *(size_t*)(arena->current_block_addr) = arena->current_block_capacity
-                                                    - (size + alignment - offset);
-        }
-        else
-        {
-            *(size_t*)(arena->current_block_addr) = arena->current_block_capacity
-                                                                           - size;
-        }
+        // updating free_space in the block header
+        *(size_t*)(arena->current_block_addr) -= (size + (pos - old_cursor));
 
-        arena->cursor = ptr + size;
-        return ptr;
+        arena->cursor = (unsigned char*)pos + size;
+        return (unsigned char*)pos;
     }
     else
     {
@@ -85,42 +76,34 @@ void* bda_alloc(bd_arena* arena, size_t size, size_t alignment)
         if ( !handle )
             return NULL;
 
-        *handle = (bda_block_header)
-                  {
-                      new_block_capacity,
-                      (bda_block_header*)arena->current_block_addr
-                  };
-
         arena->total_size += new_block_size;
         arena->current_block_capacity = new_block_capacity;
         arena->current_block_addr = (unsigned char*)handle;
 
-        unsigned char* ptr = (unsigned char*)handle + sizeof *handle;
-        size_t offset = (uintptr_t)ptr % alignment;
-        if ( offset )
-        {
-            ptr = ptr + alignment - offset;
-            handle->free_space = new_block_capacity - (size + alignment - offset);
-        }
-        else
-        {
-            handle->free_space = new_block_capacity - size;
-        }
+        uintptr_t data_block_begin = (uintptr_t)handle + sizeof *handle;
+        uintptr_t pos = (data_block_begin + alignment - 1) & ~(alignment - 1);
 
-        arena->cursor = ptr + size;
-        return ptr;
+        *handle = (bda_block_header)
+                  {
+                      new_block_capacity - (size + (pos - data_block_begin)),
+                      handle
+                  };
+
+        arena->cursor = (unsigned char*)pos + size;
+        return (unsigned char*)pos;
     }
 }
 
 void* bda_halloc(bd_arena* arena, size_t size, size_t alignment)
 {
-    unsigned char* ptr = arena->cursor;
-    size_t offset = (uintptr_t)ptr % alignment;
-    if ( offset )
-        ptr = ptr + alignment - offset;
+    uintptr_t old_cursor = (uintptr_t)arena->cursor;
+    uintptr_t pos = (old_cursor + alignment - 1) & ~(alignment - 1);
 
-    arena->cursor = ptr + size;
-    return ptr;
+    // updating free_space in the block header
+    *(size_t*)(arena->current_block_addr) -= (size + (pos - old_cursor));
+
+    arena->cursor = (unsigned char*)pos + size;
+    return (unsigned char*)pos;
 }
 
 void* bda_put_bytes(bd_arena* arena, const void* buffer, size_t len)

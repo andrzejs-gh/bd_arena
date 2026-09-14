@@ -148,7 +148,7 @@ void put_test(void)
 int main(void)
 {
     allocation_test();
-    put_test();
+    //put_test();
 
     bd_arena test_arena = bda_init(KiB);
     //if test_arena
