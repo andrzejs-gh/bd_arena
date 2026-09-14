@@ -23,10 +23,10 @@
 
 #define LIMIT 1000000
 
-void allocation_test(void)
+void allocation_time_test(void)
 {
     double time;
-    uintptr_t i = 0;
+    uint64_t i = 0;
 
     bd_arena arena_one = bda_init(8);
     arena_one.growth_factor = 1.00;
@@ -110,9 +110,9 @@ void allocation_test(void)
         LIMIT,
         time,
 
-        uint64_t* p = malloc(sizeof *p); // this will end up in 8 MB
-        *p = i++;                        // memory leak, but that's ok
-    );                                   // for the test purposes
+        uint64_t* p = malloc(sizeof *p);   // it will create an 8 MB memory leak
+        *p = i++;                          // but that's fine for the test purposes
+    );
 
     printf("malloc:     t = %.9f \n", time);
 
@@ -120,16 +120,16 @@ void allocation_test(void)
 
     puts(CYAN("================================"));
 
-    bda_free(&arena_one);
-    bda_free(&arena_two);
-    bda_free(&arena_three);
+    bda_free(&arena_one);   //free(arena_one_ptrs);
+    bda_free(&arena_two);   //free(arena_two_ptrs);
+    bda_free(&arena_three); //free(arena_three_ptrs);
 }
 
 void put_test(void)
 {
     char buffer[256];
 
-    puts("Insert arbitrary (max 255 bytes) text and press ENTER: \n");
+    puts("Insert arbitrary (max 255 bytes) text and press ENTER:");
 
     void* ret = fgets(buffer, sizeof(buffer), stdin);
     if ( !ret )
@@ -140,15 +140,47 @@ void put_test(void)
 
     bd_arena ar = bda_init(sizeof(buffer));
     char* p = bda_put_str(&ar, buffer);
-    printf("Inserted text: %s \n", p);
+    printf(GREEN("Inserted text:") "\n%s \n", p);
 
     bda_free(&ar);
 }
 
+void arena_random_test(void)
+{
+    uint64_t* p;
+
+    bd_arena alloc_arena_small = bda_init(8);
+    alloc_arena_small.growth_factor = 1.00;
+
+    bd_arena alloc_arena = bda_init(LIMIT*sizeof(uint64_t));
+    bd_arena halloc_arena = bda_init(2*LIMIT*sizeof(uint64_t));
+
+    uint64_t** alloc_arena_small_ptrs = malloc(LIMIT*sizeof(uint64_t*));
+    uint64_t** alloc_arena_ptrs = malloc(LIMIT*sizeof(uint64_t*));
+    uint64_t** halloc_arena_ptrs = malloc(LIMIT*sizeof(uint64_t*));
+
+    for ( uint64_t i = 0; i < LIMIT; i++ )
+    {
+        p = bda_ALLOC(&alloc_arena_small, uint64_t);
+        *p = i;
+        alloc_arena_small_ptrs[i] = p;
+
+        p = bda_ALLOC(&alloc_arena_small, uint64_t);
+        *p = i;
+        alloc_arena_ptrs[i] = p;
+
+        p = bda_HALLOC(&alloc_arena_small, uint64_t);
+        *p = i;
+        halloc_arena_ptrs[i] = p;
+    }
+
+}
+
 int main(void)
 {
-    allocation_test();
-    //put_test();
+    put_test();
+    allocation_time_test();
+
 
     bd_arena test_arena = bda_init(KiB);
     //if test_arena
