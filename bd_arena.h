@@ -31,6 +31,8 @@ extern const bd_arena INVALID_ARENA;
 
 bd_arena bda_init(size_t block_capacity);
 bd_arena* bda_is_valid(bd_arena* arena);
+size_t bda_block_free_space(bd_arena* arena);
+size_t bda_new_block(bd_arena* arena, size_t capacity);
 void* bda_alloc(bd_arena* arena, size_t size, size_t alignment);
 void* bda_halloc(bd_arena* arena, size_t size, size_t alignment);
 void* bda_put_bytes(bd_arena* arena, const void* buffer, size_t len);

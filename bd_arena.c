@@ -56,6 +56,36 @@ bd_arena* bda_is_valid(bd_arena* arena)
     return arena;
 }
 
+size_t bda_block_free_space(bd_arena* arena)
+{
+    if ( !arena ) return NULL;
+
+    return *(size_t*)arena->current_block_addr;
+}
+
+size_t bda_new_block(bd_arena* arena, size_t capacity)
+{
+    if ( !arena || !capacity )
+        return 0;
+
+    bda_block_header* handle = malloc(sizeof *handle + capacity);
+    if ( !handle )
+        return 0;
+
+    *handle = (bda_block_header)
+              {
+                  capacity,
+                  (bda_block_header*)arena->current_block_addr
+              };
+
+    arena->current_block_addr = (unsigned char*)handle;
+    arena->current_block_capacity = capacity;
+    arena->total_size += sizeof *handle + capacity;
+    arena->cursor = (unsigned char*)handle + sizeof *handle;
+
+    return capacity;
+}
+
 void* bda_alloc(bd_arena* arena, size_t size, size_t alignment)
 {
     if ( !arena ) return NULL;
