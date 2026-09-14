@@ -42,7 +42,6 @@ void bda_free(bd_arena* arena);
 
 #ifdef BD_ARENA_IMPLEMENTATION
 
-#include <stddef.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
