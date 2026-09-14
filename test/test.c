@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <time.h>
 
 #define RED(x) "\033[31m" x "\033[0m"
@@ -153,6 +154,7 @@ void put_test(void)
 
     puts("Press any key to continue...");
     getchar();
+    fflush(stdin);
 
     puts(CYAN("================================"));
 }
