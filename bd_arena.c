@@ -78,10 +78,17 @@ void* bda_alloc(bd_arena* arena, size_t size, size_t alignment)
 
         uintptr_t data_block_begin = (uintptr_t)handle + sizeof *handle;
         uintptr_t pos = (data_block_begin + alignment - 1) & ~(alignment - 1);
+        size_t taken_space = (size + (pos - data_block_begin));
+
+        if ( taken_space > new_block_capacity )
+        {
+            free(handle);
+            return NULL;
+        }
 
         *handle = (bda_block_header)
                   {
-                      new_block_capacity - (size + (pos - data_block_begin)),
+                      new_block_capacity - taken_space,
                       (bda_block_header*)arena->current_block_addr
                   };
 
