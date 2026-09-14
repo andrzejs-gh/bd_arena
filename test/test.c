@@ -1,5 +1,6 @@
-#include "../bd_arena.h"
-#include "../bd_arena.c"
+#define BD_ARENA_IMPLEMENTATION
+#include "../header-only/bd_arena.h"
+
 #include "time_exec.h"
 
 #include <stdint.h>
