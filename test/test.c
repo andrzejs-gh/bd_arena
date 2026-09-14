@@ -36,7 +36,7 @@ void allocation_time_test(void)
     uint64_t i = 0;
 
     bd_arena arena_one = bda_init(8);
-    arena_one.growth_factor = 1.00;
+    arena_one.growth_factor = 2.00;
 
     bd_arena arena_two = bda_init(LIMIT*sizeof(uint64_t));
     bd_arena arena_three = bda_init(2*LIMIT*sizeof(uint64_t));
