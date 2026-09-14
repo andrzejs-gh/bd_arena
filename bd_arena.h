@@ -17,15 +17,6 @@
 #define bda_HRESERVE(arena_ptr, size)                                       \
         bda_halloc( (arena_ptr), (size), 1 )
 
-typedef struct bda_block_header bda_block_header;
-
-typedef struct bda_block_header
-{
-    size_t free_space;
-    bda_block_header* prev_block_handle;
-
-} bda_block_header;
-
 typedef struct
 {
     size_t current_block_capacity;
