@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define RED(x) "\033[31m" x "\033[0m"
 #define GREEN(x) "\033[32m" x "\033[0m"
@@ -22,6 +23,11 @@
 #define MiB 1024*KiB
 
 #define LIMIT 1000000
+
+static inline uint64_t random_from_range(uint64_t min, uint64_t max)
+{
+    return min + random() % (max - min);
+}
 
 void allocation_time_test(void)
 {
@@ -127,8 +133,9 @@ void allocation_time_test(void)
 
 void put_test(void)
 {
-    char buffer[256];
+    puts(YELLOW("Insertion test:"));
 
+    char buffer[256];
     puts("Insert arbitrary (max 255 bytes) text and press ENTER:");
 
     void* ret = fgets(buffer, sizeof(buffer), stdin);
@@ -140,13 +147,21 @@ void put_test(void)
 
     bd_arena ar = bda_init(sizeof(buffer));
     char* p = bda_put_str(&ar, buffer);
-    printf(GREEN("Inserted text:") "\n%s \n", p);
+    printf(GREEN("Inserted text:") "\n%s", p);
 
     bda_free(&ar);
+
+    puts("Press any key to continue...");
+    getchar();
+
+    puts(CYAN("================================"));
 }
 
-void arena_random_test(void)
+void arena_randomized_test(void)
 {
+    puts(YELLOW("Randomized test..."));
+
+    srandom((unsigned)time(NULL));
     uint64_t* p;
 
     bd_arena alloc_arena_small = bda_init(8);
@@ -165,27 +180,69 @@ void arena_random_test(void)
         *p = i;
         alloc_arena_small_ptrs[i] = p;
 
-        p = bda_ALLOC(&alloc_arena_small, uint64_t);
+        p = bda_ALLOC(&alloc_arena, uint64_t);
         *p = i;
         alloc_arena_ptrs[i] = p;
 
-        p = bda_HALLOC(&alloc_arena_small, uint64_t);
+        p = bda_HALLOC(&halloc_arena, uint64_t);
         *p = i;
         halloc_arena_ptrs[i] = p;
     }
 
+    uint64_t iters = LIMIT*10;
+
+    for ( uint64_t i = 0; i < iters; i++ )
+    {
+        uint64_t index = random_from_range(0, LIMIT);
+
+        switch ( index % 3 )
+        {
+            case 0:
+                if ( *alloc_arena_small_ptrs[index] != index )
+                {
+                    printf("alloc_arena_small: data mismatch at %zu\n", index);
+                    printf("expected value: %zu, actual value: %zu",
+                            index, *alloc_arena_small_ptrs[index]);
+                    assert(false);
+                } break;
+
+            case 1:
+                if ( *alloc_arena_ptrs[index] != index )
+                {
+                    printf("alloc_arena: data mismatch at %zu\n", index);
+                    printf("expected value: %zu, actual value: %zu",
+                           index, *alloc_arena_ptrs[index]);
+                    assert(false);
+                } break;
+
+            case 2:
+                if ( *halloc_arena_ptrs[index] != index )
+                {
+                    printf("halloc_arena: data mismatch at %zu\n", index);
+                    printf("expected value: %zu, actual value: %zu",
+                           index, *halloc_arena_ptrs[index]);
+                    assert(false);
+                } break;
+        }
+        printf(CR);
+        printf("[ %.2f %% ]", ((double)(i+1) / iters) * 100);
+        fflush(stdout);
+    }
+
+    bda_free(&alloc_arena_small); free(alloc_arena_small_ptrs);
+    bda_free(&alloc_arena);       free(alloc_arena_ptrs);
+    bda_free(&halloc_arena);      free(halloc_arena_ptrs);
+
+    puts(OK " Randomized test passed");
+    puts(BLUE("* * *"));
+    puts(CYAN("================================"));
 }
 
 int main(void)
 {
     put_test();
     allocation_time_test();
-
-
-    bd_arena test_arena = bda_init(KiB);
-    //if test_arena
-
-    bda_free(&test_arena);
+    arena_randomized_test();
 
     return 0;
 }
