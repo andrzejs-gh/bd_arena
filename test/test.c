@@ -241,6 +241,95 @@ void arena_randomized_test(void)
     puts(CYAN("================================"));
 }
 
+void readme_scenario(void)
+{
+    /* Let's create new arena and give it a capacity of 1 KiB */
+    bd_arena arena = bda_init(1024); // bd_arena is always returned by value
+
+    /* Let's allocate some variables */
+    int* some_int = bda_ALLOC(&arena, int);
+    *some_int = -33;
+
+    double* some_double = bda_ALLOC(&arena, double);
+    *some_double = 0.1234567;
+
+    uint64_t* some_u64 = bda_ALLOC(&arena, uint64_t);
+    *some_u64 = 12345678131329;
+
+    /* Now let's allocate some strings and bytes */
+    const char* some_str = "some string that may be modified later";
+    char* some_str_cpy = bda_put_str(&arena, some_str);
+
+    uint8_t some_buffer[] = {0x7A, 0x0F, 0xC1, 0x00, 0xE5, 0x92, 0x4B, 0x07};
+    size_t some_buffer_len = sizeof(some_buffer) / sizeof(uint8_t);
+    uint8_t* some_buffer_ptr = bda_put_bytes(&arena, some_buffer, some_buffer_len);
+
+    /* Now lets exceed the 1 KiB capacity */
+    size_t space = bda_block_free_space(&arena);
+    printf("There is %zu bytes left. \n", space); // prints remaining free space
+    // in the current block
+
+    printf(
+        "Total occupied size (all blocks + headers) = %zu \n",
+           arena.total_size
+    );  // prints total space occupied by the arena
+
+    struct some_struct
+    {
+        uint8_t buffer[1024];  // this easily exceeds the current block
+                               // which already contains data (potentially padded)
+    };
+
+    struct some_struct* ptr = bda_ALLOC(&arena, struct some_struct);
+    // Because the requested space exceeded the current block capacity,
+    // arena had to grow by allocating a new block. The new block's size
+    // is determined by arena's growth_factor:
+    // new_block_capacity = old_block_capacity * growth_factor
+    // We didn't change the growth_factor value (default value is 1.0),
+    // so the new block is the same size as the initial block.
+
+    printf("There is %zu bytes left. \n", bda_block_free_space(&arena));
+    // prints 0 because the second block is entirely occupied
+    // with a struct equal to its size
+
+    printf(
+        "Total occupied size (all blocks + headers) = %zu \n",
+           arena.total_size
+    );
+    // prints 2*(sizeof(bda_block_header) + 1024),
+    // bda_block_header is a small struct:
+    //
+    // typedef struct bda_block_header
+    // {
+    //     size_t free_space;
+    //     bda_block_header* prev_block_handle;
+    //
+    // } bda_block_header;
+
+    /* if we try to allocate something larger than
+     c urrent_block_capacity * growth_fact*or,
+     the allocator will fail and return NULL */
+    int* large_array = bda_ALLOC(&arena, int[1000]);   // NULL
+    void* reserved_buffer = bda_RESERVE(&arena, 2000); // NULL
+    // only hazardous allocator (bda_HALLOC, bda_HRESERVE) would
+    // have bypassed safety checks, corrupting memory in the process
+
+    /* but if we create a new block that's large enough,
+     t he allocation will succeed */
+     bda_new_block(&arena, 2000);
+     large_array = bda_ALLOC(&arena, int[1000]);
+     // alternatively, we could also tweak the growth_factor
+     // to make the arena grow sufficiently large block
+
+     /* now let's free the arena */
+     bda_free(&arena);
+
+     /* the arena is now set to invalid state
+      d efined as: (bd_arena){0} */
+      if ( !bda_is_valid(&arena) )
+          puts("Arena is in invalid state.");
+}
+
 int main(void)
 {
     put_test();

@@ -61,6 +61,8 @@ const bd_arena INVALID_ARENA = {0};
 
 bd_arena bda_init(size_t block_capacity)
 {
+    if ( !block_capacity ) return INVALID_ARENA;
+
     bda_block_header* handle = malloc(sizeof *handle + block_capacity);
     if ( !handle ) return INVALID_ARENA;
 
@@ -102,7 +104,7 @@ bd_arena* bda_is_valid(bd_arena* arena)
 
 size_t bda_block_free_space(bd_arena* arena)
 {
-    if ( !arena ) return NULL;
+    if ( !arena ) return 0;
 
     return *(size_t*)arena->current_block_addr;
 }
