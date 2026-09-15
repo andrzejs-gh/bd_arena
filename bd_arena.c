@@ -156,6 +156,9 @@ void* bda_halloc(bd_arena* arena, size_t size, size_t alignment)
 
 void* bda_put_bytes(bd_arena* arena, const void* buffer, size_t len)
 {
+    if ( !buffer || !len )
+        return NULL;
+
     void* ptr = bda_RESERVE(arena, len);
     if ( !ptr )
         return NULL;
