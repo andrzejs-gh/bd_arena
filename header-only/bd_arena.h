@@ -84,9 +84,9 @@ bd_arena* bda_is_valid(bd_arena* arena)
         return NULL;
     if ( !arena->current_block_capacity )
         return NULL;
-    if ( arena->total_size < arena->current_block_capacity )
+    if ( arena->total_size < arena->current_block_capacity + sizeof(bda_block_header) )
         return NULL;
-    if ( !arena->growth_factor )
+    if ( arena->growth_factor < 0.0 )
         return NULL;
 
     uintptr_t cursor = (uintptr_t)arena->cursor;
